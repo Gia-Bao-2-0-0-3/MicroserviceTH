@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  product-service:
+    build: ./product-service # Đảm bảo thư mục build đúng
+    container_name: product-service
+    ports:
+      - "3101:3001" # Map cổng 3001 trong container ra cổng 3101 trên host
+    environment:
+      - PORT=3001
+      - MONGO_URL=mongodb://mongo:27017/product-service # URL kết nối MongoDB
+    depends_on:
+      - mongo # Đảm bảo MongoDB khởi động trước
+    restart: unless-stopped # Tự động restart nếu container dừng
+
+  mongo:
+    image: mongo:5 # Sử dụng phiên bản MongoDB 5
+    container_name: mongo
+    ports:
+      - "27018:27017" # Map cổng 27017 trong container ra cổng 27018 trên host
+    volumes:
+      - mongo_data:/data/db # Lưu trữ dữ liệu MongoDB vào volume
+    restart: unless-stopped # Tự động restart nếu container dừng
+
+volumes:
+  mongo_data: # Volume để lưu trữ dữ liệu MongoDB
