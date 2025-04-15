@@ -3,7 +3,7 @@ services:
   api-gateway:
     build: ./api-gateway
     ports:
-      - "${API_GATEWAY_PORT}:3000"
+      - "3000:3000" # Sửa lại cổng để đồng nhất
     depends_on:
       - product-service
     networks:
@@ -14,13 +14,13 @@ services:
   product-service:
     build: ./product-service
     ports:
-      - "${PRODUCT_SERVICE_PORT}:3001"
+      - "3001:3001" # Sửa lại cổng để đồng nhất
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB_PRODUCT}
-      - DB_PORT=5436
+      - DB_PORT=5432
       - PORT=3001
     depends_on:
       - postgres
@@ -32,7 +32,7 @@ services:
   customer-service:
     build: ./customer-service
     ports:
-      - "${CUSTOMER_SERVICE_PORT}:3002"
+      - "3002:3002" # Sửa lại cổng để đồng nhất
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
@@ -50,13 +50,13 @@ services:
   order-service:
     build: ./order-service
     ports:
-      - "${ORDER_SERVICE_PORT}:3003"
+      - "3003:3003" # Sửa lại cổng để đồng nhất
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB_ORDER}
-      - DB_PORT=5436
+      - DB_PORT=5432
       - PORT=3003
     depends_on:
       - postgres

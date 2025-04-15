@@ -5,7 +5,7 @@ const controller = require('../controllers/product.controller');
 router.get('/', controller.get);
 router.get('/:id', controller.getOne);
 router.post('/', controller.post);
-router.post('/update/:id', controller.put);
-router.post('/delete/:id', controller.delete);
+router.put('/update/:id', controller.put); 
+router.delete('/delete/:id', controller.delete);
 
 module.exports = router;
