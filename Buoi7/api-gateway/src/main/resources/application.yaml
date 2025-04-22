@@ -15,7 +15,6 @@ spring:
               args:
                 name: authCB
                 fallbackUri: forward:/fallback/auth
-
         - id: book-service
           uri: http://localhost:8082
           predicates:
@@ -25,7 +24,6 @@ spring:
               args:
                 name: bookCB
                 fallbackUri: forward:/fallback/book
-
 management:
   endpoints:
     web:

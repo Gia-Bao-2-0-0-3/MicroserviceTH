@@ -10,30 +10,45 @@ import org.springframework.web.client.RestTemplate;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+
 public class AuthService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @CircuitBreaker(name = "bookService", fallbackMethod = "fallback")
-    @Retry(name = "bookService", fallbackMethod = "fallback")
-    @RateLimiter(name = "bookService", fallbackMethod = "fallback")
-    @TimeLimiter(name = "bookService", fallbackMethod = "fallback")
-    public CompletableFuture<String> checkBooks(String type) {
+    @Retry(name = "bookService")
+    @TimeLimiter(name = "bookService")
+    public CompletableFuture<String> checkBooks() {
+        return CompletableFuture.supplyAsync(() ->
+                restTemplate.getForObject("http://localhost:8082/books/user", String.class)
+        );
+    }
+
+    public CompletableFuture<String> fallback(Throwable t) {
+        return CompletableFuture.completedFuture("Fallback from AuthService");
+    }
+
+    @RateLimiter(name = "bookService", fallbackMethod = "rateLimiterFallback")
+    public CompletableFuture<String> fetchBooks() {
+        System.out.println("Rate Limited ....");
+        return CompletableFuture.supplyAsync(() ->
+                restTemplate.getForObject("http://localhost:8082/books/user", String.class)
+        );
+    }
+
+    // Phương thức fallback khi giới hạn tốc độ bị vượt quá
+    public CompletableFuture<String> rateLimiterFallback(Throwable t) {
+        return CompletableFuture.completedFuture("Rate limit exceeded. Please try again later.");
+    }
+    @Retry(name = "bookService", fallbackMethod = "retryFallback")
+    public CompletableFuture<String> retry() {
+        System.out.println("Retrying...");
         return CompletableFuture.supplyAsync(() -> {
-            switch (type) {
-                case "timeout":
-                    try { Thread.sleep(4000); } catch (InterruptedException e) {}
-                    break;
-                case "error":
-                    throw new RuntimeException("Simulated error");
-                default:
-                    break;
-            }
-            return restTemplate.getForObject("http://localhost:8082/books/user", String.class);
+            // Simulate a call to an external service
+            throw new RuntimeException("Service unavailable");
         });
     }
 
-
-    public CompletableFuture<String> fallback(Throwable t) {
-        return CompletableFuture.completedFuture("Fallback: Service is currently unavailable or failed. Error: " + t.getMessage());
+    public CompletableFuture<String> retryFallback(Throwable t) {
+        return CompletableFuture.completedFuture("Fallback from Retry");
     }
 }
